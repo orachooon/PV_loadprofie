@@ -1,0 +1,13 @@
+# Virtual Environment
+venv/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Python
+__pycache__/
+*.pyc
+
+# Output Files (ไม่ต้องจำไฟล์ผลลัพธ์ที่สร้างใหม่ได้ตลอดเวลา)
+load_profile_8760.csv
+combined_profile_8760.csv
