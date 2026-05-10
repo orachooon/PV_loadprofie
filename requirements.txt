@@ -5,3 +5,5 @@ openpyxl
 pvlib
 jupytext
 requests
+streamlit
+plotly
