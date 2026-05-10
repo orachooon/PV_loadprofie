@@ -320,9 +320,105 @@ plt.legend()
 plt.tight_layout()
 plt.show()
 
+# %% [markdown]
+# # ส่วนที่ 9: การวิเคราะห์ทางเศรษฐศาสตร์ (Economic Analysis)
+# คำนวณความคุ้มค่าของการลงทุน: Payback, NPV, IRR และ LCOE
+
+# %%
+print("\n--- กำลังเริ่มการวิเคราะห์ทางเศรษฐศาสตร์ ---")
+
+# 1. ตั้งค่าพารามิเตอร์การลงทุน (Parameters)
+total_capex     = 3_000_000  # มูลค่าการลงทุนรวม (บาท)
+elec_tariff     = 4.50       # ค่าไฟฟ้าที่ประหยัดได้ (บาท/kWh)
+fit_tariff      = 2.20       # อัตราขายไฟคืน/Net Metering (บาท/kWh)
+elec_escalation = 0.03       # อัตราค่าไฟขึ้นราคาต่อปี (3%)
+project_life    = 25         # อายุโครงการ (ปี)
+discount_rate   = 0.06       # WACC / Discount Rate (6%)
+degradation     = 0.005      # อัตราเสื่อมสภาพแผงต่อปี (0.5%)
+opex_pct        = 0.01       # ค่าบำรุงรักษารายปี (1% ของ CAPEX)
+
+# 2. คำนวณสัดส่วนการใช้ไฟ (Self-Consumption)
+total_load_yr  = df_year['Adjusted_Load_kWh'].sum()
+total_pv_yr    = df_year['PV_Generation_kW'].sum()
+
+# พลังงานที่ใช้เอง = ค่าที่น้อยกว่าระหว่าง Load กับ PV ในแต่ละชั่วโมง
+df_year['Self_Consumed_kW'] = np.minimum(df_year['Adjusted_Load_kWh'], df_year['PV_Generation_kW'])
+self_consumed_yr = df_year['Self_Consumed_kW'].sum()
+exported_yr      = (df_year['PV_Generation_kW'] - df_year['Adjusted_Load_kWh']).clip(lower=0).sum()
+
+sc_ratio = self_consumed_yr / total_pv_yr * 100
+ss_ratio = self_consumed_yr / total_load_yr * 100
+
+# 3. คำนวณกระแสเงินสด (Cash Flow Projection)
+opex_annual = total_capex * opex_pct
+cashflows = [-total_capex]  # ปีที่ 0 ติดลบเท่ากับเงินลงทุน
+
+for yr in range(1, project_life + 1):
+    # ปรับราคาตาม Escalation และประสิทธิภาพตาม Degradation
+    elec_t    = elec_tariff * (1 + elec_escalation) ** (yr - 1)
+    fit_t     = fit_tariff  * (1 + elec_escalation) ** (yr - 1)
+    sc_t      = self_consumed_yr * (1 - degradation) ** (yr - 1)
+    exp_t     = exported_yr      * (1 - degradation) ** (yr - 1)
+    
+    # รายได้สุทธิปีนั้นๆ = (ใช้เอง * ค่าไฟ) + (ขายคืน * FiT) - ค่าซ่อมบำรุง
+    savings_t = (sc_t * elec_t) + (exp_t * fit_t) - opex_annual
+    cashflows.append(savings_t)
+
+# 4. คำนวณดัชนีชี้วัด (Financial KPIs)
+# Simple Payback
+annual_savings_yr1 = cashflows[1]
+payback = total_capex / annual_savings_yr1 if annual_savings_yr1 > 0 else float('inf')
+
+# NPV (Net Present Value)
+npv = sum(cf / (1 + discount_rate) ** t for t, cf in enumerate(cashflows))
+
+# IRR (Internal Rate of Return) - ใช้ Newton's method แบบพื้นฐาน
+def calc_irr(cfs):
+    rate = 0.1
+    for _ in range(1000):
+        f  = sum(cf / (1 + rate) ** t for t, cf in enumerate(cfs))
+        df = sum(-t * cf / (1 + rate) ** (t + 1) for t, cf in enumerate(cfs))
+        if abs(df) < 1e-12: break
+        rate -= f / df
+        if rate <= -1: return None
+    return rate
+irr = calc_irr(cashflows)
+
+# LCOE (Levelized Cost of Energy)
+disc_opex = sum(opex_annual / (1 + discount_rate) ** t for t in range(1, project_life + 1))
+disc_gen  = sum((total_pv_yr * (1 - degradation) ** (t-1)) / (1 + discount_rate) ** t 
+                for t in range(1, project_life + 1))
+lcoe = (total_capex + disc_opex) / disc_gen if disc_gen > 0 else 0
+
+# 5. สรุปผลออกหน้าจอ
+print("-" * 40)
+print(f"{'Economic Summary':^40}")
+print("-" * 40)
+print(f"Self-Consumption Ratio:  {sc_ratio:>10.1f} %")
+print(f"Self-Sufficiency Ratio:  {ss_ratio:>10.1f} %")
+print(f"Simple Payback Period:   {payback:>10.2f} ปี")
+print(f"Net Present Value (NPV): ฿ {npv:>10,.0f}")
+print(f"Internal Rate of Return: {irr*100:>10.2f} %" if irr else "IRR: N/A")
+print(f"LCOE:                    ฿ {lcoe:>10.3f} /kWh")
+print("-" * 40)
+
+# 6. พล็อตกราฟกระแสเงินสดสะสม (Cumulative Cash Flow)
+cumulative_cf = np.cumsum(cashflows)
+plt.figure(figsize=(12, 6))
+plt.bar(range(project_life + 1), cashflows, color='skyblue', label='Annual Cash Flow', alpha=0.6)
+plt.plot(range(project_life + 1), cumulative_cf, color='orange', marker='o', linewidth=2, label='Cumulative Cash Flow')
+plt.axhline(0, color='red', linestyle='--', alpha=0.5)
+plt.title('Investment Analysis: Cumulative Cash Flow over Project Life', fontsize=14)
+plt.xlabel('Year')
+plt.ylabel('Cash Flow (Baht)')
+plt.grid(True, alpha=0.3)
+plt.legend()
+plt.tight_layout()
+plt.show()
+
 # %%
 # Export ข้อมูลใหม่ทั้งหมด (Load, PV, Net Load) รวมไว้ในไฟล์เดียว เพื่อนำไปวิเคราะห์ต่อ
 output_file_all = 'combined_profile_8760.csv'
 df_export_all = df_year[['Adjusted_Load_kWh', 'PV_Generation_kW', 'Net_Load_kW']].round(4)
 df_export_all.to_csv(output_file_all, index=False)
-print(f"\nExport ข้อมูลรวมสำเร็จ! บันทึกไปที่: {output_file_all}")
+print(f"\n✅ Export ข้อมูลรวมสำเร็จ! บันทึกไปที่: {output_file_all}")
