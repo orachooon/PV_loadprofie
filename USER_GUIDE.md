@@ -165,35 +165,6 @@ streamlit run app.py
 
 ---
 
-## 📥 ดาวน์โหลดผลลัพธ์ (Tab 3)
-
-| ไฟล์ | เนื้อหา | ใช้กับ |
-|---|---|---|
-| `load_profile_8760.csv` | ค่า Load รายชั่วโมง 8,760 แถว (ไม่มี Header) | PVSyst, SAM, Homer |
-| `combined_profile_8760.csv` | Load + PV + Net Load พร้อม Header และ Timestamp | Excel, Python วิเคราะห์ต่อ |
-
-กดปุ่ม **"⬇️ Download"** แล้วไฟล์จะถูกบันทึกลงในโฟลเดอร์ Downloads ของเครื่อง
-
----
-
-## ❓ แก้ปัญหาเบื้องต้น
-
-| ปัญหา | สาเหตุ | วิธีแก้ |
-|---|---|---|
-| อัปโหลดไฟล์แล้วขึ้น Error | ชื่อ Sheet ผิด | ตรวจสอบว่า Sheet ชื่อ `Weekday`, `Weekend`, `Targets` (ตรงตัว) |
-| กราฟ Daily Profile ดูแปลก | ข้อมูลไม่มีจุด 00:00 | เพิ่มแถว Time=00:00 ใน Weekday และ Weekend |
-| PV Simulation ขึ้น Error | ไม่มี Internet | ตรวจสอบการเชื่อมต่ออินเทอร์เน็ต |
-| ผลรวมรายเดือนไม่ตรง Target | ปัญหา Targets Sheet | ตรวจสอบว่ามี Month 1–12 ครบ และ Target_kWh ไม่มีค่า 0 |
-| ปุ่ม Download combined ไม่ปรากฏ | ยังไม่ได้รัน PV Simulation | กด Run Simulation ก่อน |
-
----
-
-## 📬 ติดต่อ
-
-หากพบปัญหาหรือต้องการปรับแต่งเพิ่มเติม กรุณาติดต่อเจ้าของโปรเจค
-
----
-
 ## 💰 การวิเคราะห์เศรษฐศาสตร์ (Tab 4)
 
 > ⚠️ ต้องรัน **PV Simulation** ก่อน (Tab 2) จึงจะใช้งาน Tab นี้ได้
@@ -223,5 +194,32 @@ streamlit run app.py
 | **Self-Sufficiency Ratio** | % ความต้องการไฟที่ PV ครอบคลุม | ยิ่งสูงยิ่งดี |
 
 ---
+
+## 📥 ดาวน์โหลดผลลัพธ์ (Tab 3)
+
+| ไฟล์ | เนื้อหา | ใช้กับ |
+|---|---|---|
+| `load_profile_8760.csv` | ค่า Load รายชั่วโมง 8,760 แถว (ไม่มี Header) | PVSyst, SAM, Homer |
+| `combined_profile_8760.csv` | Load + PV + Net Load พร้อม Header และ Timestamp | Excel, Python วิเคราะห์ต่อ |
+
+กดปุ่ม **"⬇️ Download"** แล้วไฟล์จะถูกบันทึกลงในโฟลเดอร์ Downloads ของเครื่อง
+
+---
+
+## ❓ แก้ปัญหาเบื้องต้น
+
+| ปัญหา | สาเหตุ | วิธีแก้ |
+|---|---|---|
+| อัปโหลดไฟล์แล้วขึ้น Error | ชื่อ Sheet ผิด | ตรวจสอบว่า Sheet ชื่อ `Weekday`, `Weekend`, `Targets` (ตรงตัว) |
+| กราฟ Daily Profile ดูแปลก | ข้อมูลไม่มีจุด 00:00 | เพิ่มแถว Time=00:00 ใน Weekday และ Weekend |
+| PV Simulation ขึ้น Error | ไม่มี Internet | ตรวจสอบการเชื่อมต่ออินเทอร์เน็ต |
+| ผลรวมรายเดือนไม่ตรง Target | ปัญหา Targets Sheet | ตรวจสอบว่ามี Month 1–12 ครบ และ Target_kWh ไม่มีค่า 0 |
+| ปุ่ม Download combined ไม่ปรากฏ | ยังไม่ได้รัน PV Simulation | กด Run Simulation ก่อน |
+
+---
+
+## 📬 ติดต่อ
+
+หากพบปัญหาหรือต้องการปรับแต่งเพิ่มเติม กรุณาติดต่อเจ้าของโปรเจค
 
 *สร้างด้วย Python · Streamlit · pvlib · Plotly*
