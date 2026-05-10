@@ -255,8 +255,23 @@ except Exception as e:
     st.error(f"❌ อ่านไฟล์ไม่ได้: {e}")
     st.stop()
 
-for df in [weekday_raw, weekend_raw]:
-    df['Time'] = pd.to_datetime('2000-01-01 ' + df['Time'].astype(str))
+def robust_time_parse(df):
+    if 'Time' not in df.columns:
+        return df
+    # 1. ลองแปลงโดยตรงก่อน (เผื่อ Excel อ่านมาเป็น Time/Datetime object แล้ว)
+    temp_time = pd.to_datetime(df['Time'], errors='coerce')
+    
+    # 2. สำหรับแถวที่แปลงไม่สำเร็จ ลองต่อเชือก 2000-01-01 เข้าไป
+    mask = temp_time.isna()
+    if mask.any():
+        temp_time[mask] = pd.to_datetime('2000-01-01 ' + df.loc[mask, 'Time'].astype(str), errors='coerce')
+    
+    # 3. บังคับให้เป็นวันที่ 2000-01-01 ทั้งหมดเพื่อความแน่นอนในการ Interpolate
+    df['Time'] = temp_time.apply(lambda x: x.replace(year=2000, month=1, day=1) if pd.notnull(x) else x)
+    return df
+
+weekday_raw = robust_time_parse(weekday_raw)
+weekend_raw = robust_time_parse(weekend_raw)
 
 monthly_targets = dict(zip(df_targets['Month'], df_targets['Target_kWh']))
 
