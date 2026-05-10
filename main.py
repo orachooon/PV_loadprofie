@@ -46,8 +46,8 @@ weekend_raw = pd.read_excel('Inputs.xlsx', sheet_name='Weekend')
 
 # แปลงเวลา (Time) ให้เป็นรูปแบบ datetime เพื่อใช้ในการคำนวณ (ใช้วันสมมติ 2000-01-01 เป็นตัวแทน)
 # แปลงเป็น string ก่อนเผื่อ Pandas ดึงข้อมูลมาจาก Excel เป็นรูปแบบ Time Object
-weekday_raw['Time'] = pd.to_datetime('2000-01-01 ' + weekday_raw['Time'].astype(str), infer_datetime_format=True)
-weekend_raw['Time'] = pd.to_datetime('2000-01-01 ' + weekend_raw['Time'].astype(str), infer_datetime_format=True)
+weekday_raw['Time'] = pd.to_datetime('2000-01-01 ' + weekday_raw['Time'].astype(str))
+weekend_raw['Time'] = pd.to_datetime('2000-01-01 ' + weekend_raw['Time'].astype(str))
 
 # โหลดข้อมูลเป้าหมายรายเดือนที่ต้องการ (kWh) จากไฟล์ Excel ชีต Targets
 df_targets = pd.read_excel('Inputs.xlsx', sheet_name='Targets')

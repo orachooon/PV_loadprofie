@@ -256,7 +256,7 @@ except Exception as e:
     st.stop()
 
 for df in [weekday_raw, weekend_raw]:
-    df['Time'] = pd.to_datetime('2000-01-01 ' + df['Time'].astype(str), infer_datetime_format=True)
+    df['Time'] = pd.to_datetime('2000-01-01 ' + df['Time'].astype(str))
 
 monthly_targets = dict(zip(df_targets['Month'], df_targets['Target_kWh']))
 
