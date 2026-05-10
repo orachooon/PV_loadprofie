@@ -160,7 +160,7 @@ def run_pv_simulation(lat, lon, tilt, azimuth, dc_kw, ac_kw, eta):
     tmy_data['day']   = tmy_data.index.day
     tmy_data['hour']  = tmy_data.index.hour
     tmy_data = tmy_data.sort_values(['month', 'day', 'hour'])
-    tmy_data.index = pd.date_range(start='2023-01-01 00:00', end='2023-12-31 23:00', freq='1H', tz='Asia/Bangkok')
+    tmy_data.index = pd.date_range(start='2023-01-01 00:00', end='2023-12-31 23:00', freq='h', tz='Asia/Bangkok')
     location = Location(latitude=lat, longitude=lon, tz='Asia/Bangkok')
     system = PVSystem(
         surface_tilt=tilt,
@@ -174,7 +174,7 @@ def run_pv_simulation(lat, lon, tilt, azimuth, dc_kw, ac_kw, eta):
                     dc_model='pvwatts', ac_model='pvwatts', losses_model='pvwatts')
     mc.run_model(tmy_data)
     pv_kw = (mc.results.ac / 1000).clip(lower=0)
-    pv_kw.index = pd.date_range(start='2023-01-01 00:00', end='2023-12-31 23:00', freq='1H')
+    pv_kw.index = pd.date_range(start='2023-01-01 00:00', end='2023-12-31 23:00', freq='h')
     return pv_kw
 
 

@@ -263,7 +263,7 @@ tmy_data['hour'] = tmy_data.index.hour
 tmy_data = tmy_data.sort_values(['month', 'day', 'hour'])
 
 # เปลี่ยน index กลับมาเป็นปี 2023 ตามที่เราใช้ใน Load Profile
-tmy_data.index = pd.date_range(start='2023-01-01 00:00', end='2023-12-31 23:00', freq='1H', tz='Asia/Bangkok')
+tmy_data.index = pd.date_range(start='2023-01-01 00:00', end='2023-12-31 23:00', freq='h', tz='Asia/Bangkok')
 
 # 3. ตั้งค่าระบบ PV System (100 kWac, 120 kWdc)
 location = Location(latitude=lat, longitude=lon, tz='Asia/Bangkok')
