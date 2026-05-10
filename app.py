@@ -126,7 +126,7 @@ def interpolate_to_hourly(df_raw):
         val = df_raw.loc[df_raw['Time'].idxmax(), 'Load_kW']
         df_raw = pd.concat([df_raw, pd.DataFrame({'Time': [t_end], 'Load_kW': [val]})], ignore_index=True)
     df_raw = df_raw.set_index('Time')
-    hourly_index = pd.date_range(start='2000-01-01 00:00', end='2000-01-01 23:00', freq='1H')
+    hourly_index = pd.date_range(start='2000-01-01 00:00', end='2000-01-01 23:00', freq='h')
     combined_index = df_raw.index.union(hourly_index).sort_values()
     df_interp = df_raw.reindex(combined_index).interpolate(method='time')
     df_hourly = df_interp.loc[hourly_index].copy()
@@ -135,7 +135,7 @@ def interpolate_to_hourly(df_raw):
 
 
 def build_yearly_profile(hourly_weekday, hourly_weekend, monthly_targets):
-    yearly_index = pd.date_range(start='2023-01-01 00:00', end='2023-12-31 23:00', freq='1H')
+    yearly_index = pd.date_range(start='2023-01-01 00:00', end='2023-12-31 23:00', freq='h')
     df_year = pd.DataFrame(index=yearly_index)
     df_year['is_weekend'] = df_year.index.dayofweek >= 5
     df_year['time_only']  = df_year.index.time

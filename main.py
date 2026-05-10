@@ -90,7 +90,7 @@ def interpolate_to_hourly(df_raw):
     df_raw = df_raw.set_index('Time')
     
     # สร้าง index ราย 1 ชั่วโมงตั้งแต่ 00:00 ถึง 23:00 ของวันสมมติ
-    hourly_index = pd.date_range(start='2000-01-01 00:00', end='2000-01-01 23:00', freq='1H')
+    hourly_index = pd.date_range(start='2000-01-01 00:00', end='2000-01-01 23:00', freq='h')
     
     # รวม index ของข้อมูลดิบกับ hourly_index เข้าด้วยกัน
     combined_index = df_raw.index.union(hourly_index).sort_values()
@@ -161,7 +161,7 @@ plt.show()
 year_to_simulate = 2023
 yearly_index = pd.date_range(start=f'{year_to_simulate}-01-01 00:00', 
                              end=f'{year_to_simulate}-12-31 23:00', 
-                             freq='1H')
+                             freq='h')
 
 df_year = pd.DataFrame(index=yearly_index)
 
